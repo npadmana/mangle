@@ -1,5 +1,11 @@
 package mangle
 
+import (
+	"errors"
+	"fmt"
+	"io"
+)
+
 type vector4d [4]float64
 
 // Dot computes the dot product of two vector4d's
@@ -22,13 +28,39 @@ func dot(x, y *vector4d) float64 {
 //     (1, -x, -y, -z) (cm > 0)
 //     (-1, x, y, z) (cm < 0)
 // and dot with (1, x1, y1, z1) and compare with cm 
-type cap struct {
+type Cap struct {
 	v  vector4d
 	cm float64
 }
 
-func incap(c *cap, v *vector4d) bool {
+// in tests to see if the point is in the cap or not.
+func (c *Cap) In(v *vector4d) bool {
 	return dot(&c.v, v) < c.cm
 }
 
-type capList []cap
+// read reads in cap coordinates from io.Reader
+func (c *Cap) Read(r io.Reader) error {
+	n, err := fmt.Fscanf(r, "%f %f %f %f \n", &c.v[1], &c.v[2], &c.v[3], &c.cm)
+	if n != 4 {
+		return errors.New("Unable to parse cap")
+	}
+	if err != nil {
+		return err
+	}
+	if c.cm < 0 {
+		c.v[0] = -1
+	} else {
+		c.v[0] = 1
+		for i := 1; i < 4; i++ {
+			c.v[i] = -c.v[i]
+		}
+	}
+	return nil
+}
+
+// String allows access to the cap type
+func (c *Cap) String() string {
+	return fmt.Sprintf("%e %e %e %e \n", c.v[1], c.v[2], c.v[3], c.cm)
+}
+
+type CapList []Cap

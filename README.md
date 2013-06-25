@@ -1,2 +1,1 @@
-go-mangle
-=========
+Basic mangle implementation in Go.
