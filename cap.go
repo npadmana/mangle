@@ -1,9 +1,9 @@
 package mangle
 
-type Vector4d [4]float64
+type vector4d [4]float64
 
-// Dot computes the dot product of two Vector4d's
-func Dot(x, y *Vector4d) float64 {
+// Dot computes the dot product of two vector4d's
+func dot(x, y *vector4d) float64 {
 	return x[0]*y[0] + x[1]*y[1] + x[2]*y[2] + x[3]*y[3]
 }
 
@@ -22,11 +22,13 @@ func Dot(x, y *Vector4d) float64 {
 //     (1, -x, -y, -z) (cm > 0)
 //     (-1, x, y, z) (cm < 0)
 // and dot with (1, x1, y1, z1) and compare with cm 
-type Cap struct {
-	V  Vector4d
-	CM float64
+type cap struct {
+	v  vector4d
+	cm float64
 }
 
-func InCap(c *Cap, v *Vector4d) bool {
-	return Dot(&c.V, v) < c.CM
+func incap(c *cap, v *vector4d) bool {
+	return dot(&c.v, v) < c.cm
 }
+
+type capList []cap
